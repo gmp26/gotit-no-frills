@@ -35,6 +35,17 @@
   (.preventDefault event)
   (change-player-count 2))
 
+(defn computer-first [event]
+  (.preventDefault event)
+  (.stopPropagation event)
+  (swap! (:game common/Gotit) assoc-in [:play-state :player] :b))
+
+(defn you-first [event]
+  (.preventDefault event)
+  (.stopPropagation event)
+  (swap! (:game common/Gotit) assoc-in [:play-state :player] :a)
+  )
+
 (defn undo
   "undo button handler"
   [event]
@@ -101,7 +112,37 @@
   "remove eventhandler to avoid memory leak"
   [event]
   (routing/save-settings)
-  (.off (js/$ "#settings") "hidden.bs.modal"))
+  (.off (js/$ "#settings") "hidden.bs.modal")
+  (when (game/is-computer-turn? common/Gotit)
+    (game/schedule-computer-turn common/Gotit)))
+
+
+(rum/defc selector < rum/static [select-1? label1 label2 action1 action2]
+  [:div
+   [:button.btn.btn-default.dropdown-toggle
+    {:type "button"
+     :data-toggle "dropdown"
+     :aria-haspopup "true"
+     :aria-expanded "false"}
+    (if (select-1?) label1 label2)
+    [:span.caret]]
+   [:ul.dropdown-menu
+    [:li [:a {:href "#" :on-click action1} label1]]
+    [:li [:a {:href "#" :on-click action2} label2]]]])
+
+(rum/defc spinner < rum/static [value on-change on-up on-down]
+  [:div
+   [:span.spinner.col-sm-7
+    [:button.up.no-select {:on-click on-up
+                           :on-touch-start on-up} "+"]
+    [:button.down.no-select {:on-click on-down
+                             :on-touch-start on-down} "-"]
+    [:input.num {:type "number"
+                 :pattern "\\d*"
+                 :input-mode "numeric"
+                 :on-change on-change
+                 :value value}]]])
+
 
 (rum/defc settings-modal < rum/reactive []
   (let [active (fn [players player-count]
@@ -129,30 +170,26 @@
          [:.row {:style {:padding "10px 0"}}
 
           [:label.col-sm-4 {:for "p1"} "Choose game"]
-          [:.btn-group.col-sm-8
-           [:button.btn.btn-default.dropdown-toggle
-            {:type "button"
-             :data-toggle "dropdown"
-             :aria-haspopup "true"
-             :aria-expanded "false"}
-            (if (= :number (:viewer (:settings game))) "Classic Got it " "Got it Island ")
-            [:span.caret]]
-           [:ul.dropdown-menu
-            [:li [:a {:href "#" :on-click #(switch-view :number)} "Classic Got it"]]
-            [:li [:a {:href "#" :on-click #(switch-view :island)} "Got it Island"]]]]][:.row {:style {:padding "20px 0"}}
+          [:.col-sm-8
+           (selector #(= :number (:viewer (:settings game)))
+                     "Classic Got it " "Got it Island "
+                     #(switch-view :number)
+                     #(switch-view :island))]]
 
-          [:label.col-sm-4 {:for "p1"} "Game mode"]
-          [:.btn-group.col-sm-8
-           [:button.btn.btn-default.dropdown-toggle
-            {:type "button"
-             :data-toggle "dropdown"
-             :aria-haspopup "true"
-             :aria-expanded "false"}
-            (if (= 1 (:players (:settings game))) "Play the computer " "Play an opponent ")
-            [:span.caret]]
-           [:ul.dropdown-menu
-            [:li [:a {:href "#" :on-click one-player} "Play the computer"]]
-            [:li [:a {:href "#" :on-click two-player} "Play an opponent"]]]]]
+         [:.row {:style {:padding "10px 0"}}
+          [:label.col-sm-4 "Game mode"]
+          [:.col-sm-8
+           (selector #(= 1 (:players (:settings game)))
+                     "Play the computer " "Play an opponent "
+                     one-player two-player)]]
+
+         (when (= 1 (:players (:settings game)))
+           [:.row {:style {:padding "10px 0"}}
+            [:label.col-sm-4 "First player:"]
+            [:.col-sm-8
+             (selector #(= :b (:player (:play-state game)))
+                       "The computer " "You "
+                       computer-first you-first)]])
 
          [:.row {:style {:padding "10px 0"}}
           [:label.col-sm-5 {:for "p2"} (if (= :number (:viewer (:settings game)))
