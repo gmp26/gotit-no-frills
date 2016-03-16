@@ -1,5 +1,6 @@
 (ns ^:figwheel-always gotit.routing
-    (:require [goog.events :as events]
+    (:require [generic.game :as game]
+              [goog.events :as events]
               [goog.history.EventType :as EventType]
               [secretary.core :as secretary :refer-macros [defroute]]
               [gotit.common :as common]
@@ -24,8 +25,6 @@
         first-player (js.parseInt f)
         viewer v]
 
-    (prn "hi")
-
     (when (and (common/check-target t) (common/check-limit l) (common/check-players p) (common/check-first f))
       (swap! (:game common/Gotit) assoc-in [:settings :target] target)
       (swap! (:game common/Gotit) assoc-in [:settings :limit] limit)
@@ -34,9 +33,8 @@
       (let [fp (if (and (= 2 players) (zero? first-player)) :a :b)]
         (swap! (:game common/Gotit) assoc-in [:play-state :player] fp)
         (common/switch-view viewer))
-      (prn "game-state " @(:game common/Gotit)))
-    )
-  )
+      (if (game/is-computer-turn? common/Gotit)
+        (game/schedule-computer-turn common/Gotit)))))
 
 (defroute full-island
   "/island/:target/:limit/:players/:first-player" {:as params}
