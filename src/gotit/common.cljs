@@ -17,6 +17,9 @@
   (and (not (js.isNaN l))(>= l min-limit) (<= l max-limit)))
 (defn check-players [p]
   (and (not (js.isNaN p))(>= p min-players) (<= p max-players)))
+(defn check-first [f]
+  (prn "f=" f)
+  (and (not (js.isNaN f)) (or (= "1" f) (= "0" f))))
 
 ;; will be created to calculate svg screen transform
 (defonce svg-point (atom false))

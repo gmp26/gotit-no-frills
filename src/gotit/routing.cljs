@@ -17,25 +17,41 @@
 (secretary/set-config! :prefix "#")
 
 
-(defn dispatching [t l p v]
+(defn dispatching [t l p f v]
   (let [target (js.parseInt t)
         limit (js.parseInt l)
         players (js.parseInt p)
+        first-player (js.parseInt f)
         viewer v]
 
-    (prn "viewer " viewer)
-    (when (and (common/check-target t) (common/check-limit l) (common/check-players p))
+    (prn "hi")
+
+    (when (and (common/check-target t) (common/check-limit l) (common/check-players p) (common/check-first f))
       (swap! (:game common/Gotit) assoc-in [:settings :target] target)
       (swap! (:game common/Gotit) assoc-in [:settings :limit] limit)
       (swap! (:game common/Gotit) assoc-in [:settings :players] players)
-      (common/switch-view viewer)
-      )))
+
+      (let [fp (if (and (= 2 players) (zero? first-player)) :a :b)]
+        (swap! (:game common/Gotit) assoc-in [:play-state :player] fp)
+        (common/switch-view viewer))
+      (prn "game-state " @(:game common/Gotit)))
+    )
+  )
 
 (defroute full-island
+  "/island/:target/:limit/:players/:first-player" {:as params}
+  (dispatching (:target params)
+               (:limit params)
+               (:players params)
+               (:first-player params)
+               :island))
+
+(defroute
   "/island/:target/:limit/:players" {:as params}
   (dispatching (:target params)
                (:limit params)
                (:players params)
+               0
                :island))
 
 (defroute
@@ -43,6 +59,7 @@
   (dispatching (:target params)
                (:limit params)
                (:players (:settings @(:game common/Gotit)))
+               0
                :island))
 
 (defroute
@@ -50,6 +67,7 @@
   (dispatching (:target params)
                (:limit (:settings @(:game common/Gotit)))
                (:players (:settings @(:game common/Gotit)))
+               0
                :island))
 
 (defroute
@@ -57,21 +75,31 @@
   (dispatching (:target (:settings @(:game common/Gotit)))
                (:limit (:settings @(:game common/Gotit)))
                (:players (:settings @(:game common/Gotit)))
+               0
                :island))
 
 
 (defroute full-number
+  "/number/:target/:limit/:players/:first-player" {:as params}
+  (dispatching (:target params)
+               (:limit params)
+               (:players params)
+               (:first-player params)
+               :number))
+
+(defroute
   "/number/:target/:limit/:players" {:as params}
   (dispatching (:target params)
                (:limit params)
                (:players params)
+               0
                :number))
-
 (defroute
   "/number/:target/:limit" {:as params}
   (dispatching (:target params)
                (:limit params)
                (:players (:settings @(:game common/Gotit)))
+               0
                :number))
 
 (defroute
@@ -79,6 +107,7 @@
   (dispatching (:target params)
                (:limit (:settings @(:game common/Gotit)))
                (:players (:settings @(:game common/Gotit)))
+               0
                :number))
 
 (defroute
@@ -86,6 +115,7 @@
   (dispatching (:target params)
                (:limit (:settings @(:game common/Gotit)))
                (:players (:settings @(:game common/Gotit)))
+               0
                :number))
 
 (defroute
@@ -93,6 +123,7 @@
   (dispatching (:target params)
                (:limit params)
                (:players params)
+               0
                :number))
 
 (defroute
@@ -100,6 +131,7 @@
   (dispatching (:target params)
                (:limit params)
                (:players (:settings @(:game common/Gotit)))
+               0
                :number))
 
 (defroute
@@ -107,6 +139,7 @@
   (dispatching (:target params)
                (:limit (:settings @(:game common/Gotit)))
                (:players (:settings @(:game common/Gotit)))
+               0
                :number))
 
 (defroute
@@ -114,12 +147,13 @@
   (dispatching (:target params)
                (:limit (:settings @(:game common/Gotit)))
                (:players (:settings @(:game common/Gotit)))
+               0
                :number))
 
 (defn params->url
   "convert parameters to a url"
-  [viewer target limit players]
-  (let [pmap {:target target :limit limit :players players}]
+  [viewer target limit players first-player]
+  (let [pmap {:target target :limit limit :players players :first-player first-player}]
     (if (= viewer :number)
       (full-number pmap)
       (full-island pmap)
@@ -129,11 +163,14 @@
 (defn save-settings
   "save settings in the url"
   []
-  (let [settings (:settings @(:game common/Gotit))]
+  (let [game @(:game common/Gotit)
+        settings (:settings game)
+        player (:player (:play-state game))]
     (.replaceState js/history nil
                    (:title settings)
                    (params->url (:viewer settings) (:target settings)
-                                (:limit settings) (:players settings)))))
+                                (:limit settings) (:players settings)
+                                (if (= 1 (:players settings)) ({:a 0 :b 1} player) 0)))))
 
 ;; history configuration.
 ;;
