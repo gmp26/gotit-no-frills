@@ -79,14 +79,17 @@
 (defn show-player [view pads]
   (let [play-state (:play-state @(:game common/Gotit))
         p (esg/xy->viewport view (get pads (:state play-state)))]
-    [:text.numb {:x (- (first p) 15)
-            :y (+  (second p) 10)
+    [:text.numb {:x (- (first p) 10)
+            :y (+  (second p) 12)
             :font-family "FontAwesome"
-            :font-size "30"
+            :font-size "36"
             :stroke "white"
             :stroke-width 1
             :fill ((:player play-state) colours)
-            }  "\uf21d"] ;street-view
+                 }
+     ;"\uf21d"
+     "\uf041"
+     ] ;street-view
     ))
 
 (defn show-target [view pads]
@@ -94,7 +97,7 @@
         target (:target settings)
         p (esg/xy->viewport view (pads target))]
     [:text.numb {:x (- (first p) 11.5)
-            :y (+  (second p) 3)
+            :y (+  (second p) 9)
             :font-family "FontAwesome"
             :font-size "30"
             :stroke "white"

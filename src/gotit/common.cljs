@@ -18,8 +18,7 @@
 (defn check-players [p]
   (and (not (js.isNaN p))(>= p min-players) (<= p max-players)))
 (defn check-first [f]
-  (prn "f=" f)
-  (and (not (js.isNaN f)) (or (= "1" f) (= "0" f))))
+  (and (not (js.isNaN f)) (or (= 1 f) (= 0 f))))
 
 ;; will be created to calculate svg screen transform
 (defonce svg-point (atom false))
@@ -96,7 +95,7 @@
   (schedule-computer-turn
     [this]
     (let [move (- (game/optimal-outcome this) (:state (:play-state @(:game this))))]
-      (swap! (:game this) assoc-in [:play-state :feedback] (str "Computer goes " move)))
+      (swap! (:game this) assoc-in [:play-state :feedback] (str "Computer moves " move)))
     (util/delayed-call (:think-time (:settings @(:game this))) #(game/play-computer-turn this)))
 
   (followers
