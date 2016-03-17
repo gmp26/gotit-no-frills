@@ -102,7 +102,7 @@
 
 
 (defroute full-number
-pwd  "/number/:target/:limit/:players/:first-player" {:as params}
+  "/number/:target/:limit/:players/:first-player" {:as params}
   (dispatching :number
                (:target params)
                (:limit params)
