@@ -122,7 +122,7 @@
           state (:state (:play-state gm))
           sum (game/heap-equivalent this)]
       (if (zero? sum)
-        (inc state)
+        (+ state (rand-nth (range 1 (:limit (:settings gm))))) ;(inc state)
         (+ sum state)))))
 
 (defonce Gotit (->Game (atom {:settings initial-settings
@@ -133,4 +133,4 @@
   [key]
   (swap! (:game Gotit) assoc-in [:settings :viewer] key)
   (swap! (:game Gotit) assoc-in [:settings :title]
-         (if (= key :number) "Got it!" "Got it Island")))
+         (if (= key :number) "Got it!" "Escape the Vortex!")))

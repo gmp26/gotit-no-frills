@@ -61,6 +61,6 @@ usually, the predicate p determines whether n is a member of a set of integers."
 
     (if-let [optimal (outcomes-by-nimber 0)]
       optimal
-      (first outcomes))
+      (rand-nth outcomes))
     )
   )

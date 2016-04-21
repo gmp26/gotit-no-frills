@@ -172,7 +172,7 @@
           [:label.col-sm-4 {:for "p1"} "Choose game"]
           [:.col-sm-8
            (selector #(= :number (:viewer (:settings game)))
-                     "Classic Got it " "Got it Island "
+                     "Classic Got it " "Escape the Vortex! "
                      #(switch-view :number)
                      #(switch-view :island))]]
 

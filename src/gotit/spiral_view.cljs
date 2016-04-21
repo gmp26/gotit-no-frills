@@ -204,8 +204,18 @@
        ])]
    ])
 
-
 (rum/defc help < rum/reactive []
+ [:div
+  [:h3.center-block
+       {:style {:color "white"
+            :max-width "800px"}}
+   "Escape the vortex of death! On your turn you can jump ahead by up to "
+   [:b (:limit (:settings (rum/react (:game common/Gotit)))) " yellow pads by"]
+
+   [:b " tapping the one you want to reach."]
+   " Be the first to reach the exit marked with a cross. "]])
+
+#_(rum/defc help < rum/reactive []
   [:div {:style {:padding "20px"}}
    [:.alert.alert-info
     "On your turn you can build up to "
