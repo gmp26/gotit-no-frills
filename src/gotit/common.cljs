@@ -89,12 +89,17 @@
 
   (play-computer-turn
     [this]
-    (hist/push-history! (:play-state @(:game this)))
-    (game/commit-play this (game/optimal-outcome this)))
+    (let [optimal-move (game/optimal-outcome this)
+          move (- optimal-move (:state (:play-state @(:game this))))]
+      (swap! (:game this) assoc-in [:play-state :feedback] (str "Computer moves " move))
+
+      (hist/push-history! (:play-state @(:game this)))
+      (game/commit-play this optimal-move)))
 
   (schedule-computer-turn
     [this]
-    (let [move (- (game/optimal-outcome this) (:state (:play-state @(:game this))))]
+
+    #_(let [move (- (game/optimal-outcome this) (:state (:play-state @(:game this))))]
       (swap! (:game this) assoc-in [:play-state :feedback] (str "Computer moves " move)))
     (util/delayed-call (:think-time (:settings @(:game this))) #(game/play-computer-turn this)))
 

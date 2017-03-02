@@ -4,15 +4,15 @@
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
 
-  :min-lein-version "2.5.3"
+  :min-lein-version "2.7.1"
 
-  :dependencies [[org.clojure/clojure "1.7.0"]
-                 [org.clojure/clojurescript "1.7.170"]
+  :dependencies [[org.clojure/clojure "1.8.0"]
+                 [org.clojure/clojurescript "1.9.293"]
                  [devcards "0.2.1-5"]
                  [sablono "0.5.3"]
                  [cljsjs/jquery "2.1.4-0"]
                  [cljsjs/bootstrap "3.3.6-0"]
-
+                 [figwheel-sidecar "0.5.8"]
                  ;; need to specify this for sablono
                  ;; when not using devcards
                  [cljsjs/react "0.14.3-0"]
@@ -22,8 +22,7 @@
                  [rum "0.6.0"]
                  ]
 
-  :plugins [[lein-figwheel "0.5.0-6"]
-            [lein-cljsbuild "1.1.2" :exclusions [org.clojure/clojure]]]
+  :plugins [[lein-cljsbuild "1.1.2" :exclusions [org.clojure/clojure]]]
 
   :clean-targets ^{:protect false} ["resources/public/js/compiled"
                                     "target"]
